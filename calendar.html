@@ -7,19 +7,15 @@
     <link rel="stylesheet" href="calendar.css">
 </head>
 <body>
-    <a href="dashboard.html" style="
-    display: inline-block;
-    background-color: #0288d1;
-    color: #ffffff;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    margin: 20px 0;
-    text-decoration: none;
-    text-align: center;
-">Return to Dashboard</a>
+    <div class="header">
+        <div class="logo">
+            <a href="dashboard.html"><img src="images/logo_light.png" alt="Logo"></a>
+            <h1>LinkedLearn</h1>
+        </div>
+    </div>
+
+    <a href="dashboard.html" class="btn-return">Return to Dashboard</a>
+
     <div class="container">
         <h1>Upcoming Deadlines and Dates</h1>
         <div class="controls">
@@ -28,6 +24,13 @@
             <button id="nextMonth">Next Month</button>
         </div>
         <div id="calendar" class="calendar"></div>
+
+        <div class="event-form">
+            <h2>Add Event</h2>
+            <input type="date" id="eventDate" required>
+            <input type="text" id="eventTitle" placeholder="Event Title" required>
+            <button id="addEventBtn">Add Event</button>
+        </div>
     </div>
 
     <script src="calendar.js"></script>

@@ -1,74 +1,93 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const events = [
-        { date: 5, month: 8, year: 2024, title: 'Assignment Deadline' },
-        { date: 15, month: 8, year: 2024, title: 'Project Due' },
-        { date: 20, month: 8, year: 2024, title: 'Exam' }
-    ];
+// Select DOM elements
+const calendar = document.getElementById("calendar");
+const currentMonthYear = document.getElementById("currentMonthYear");
+const prevMonthBtn = document.getElementById("prevMonth");
+const nextMonthBtn = document.getElementById("nextMonth");
+const addEventBtn = document.getElementById("addEventBtn");
 
-    const calendarDiv = document.getElementById('calendar');
-    const currentMonthYearSpan = document.getElementById('currentMonthYear');
-    let currentDate = new Date();
+let today = new Date();
+let currentMonth = today.getMonth();
+let currentYear = today.getFullYear();
 
-    function renderCalendar(month, year) {
-        calendarDiv.innerHTML = '';
+// Array for month names
+const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
 
-        // Display month and year
-        currentMonthYearSpan.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+// Render calendar for the given month and year
+function renderCalendar(month, year) {
+    calendar.innerHTML = "";
+    currentMonthYear.textContent = `${monthNames[month]} ${year}`;
 
-        // Create headers for days of the week
-        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        daysOfWeek.forEach(day => {
-            const header = document.createElement('div');
-            header.className = 'header';
-            header.innerText = day;
-            calendarDiv.appendChild(header);
-        });
+    // Get the first day of the month and the number of days in the month
+    const firstDay = new Date(year, month).getDay();
+    const daysInMonth = 32 - new Date(year, month, 32).getDate();
 
-        // Get first day of the month and number of days in month
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Create empty cells for days before the start of the month
+    for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement("div");
+        calendar.appendChild(emptyCell);
+    }
 
-        // Create empty cells for days before the first of the month
-        for (let i = 0; i < firstDay; i++) {
-            const emptyDiv = document.createElement('div');
-            calendarDiv.appendChild(emptyDiv);
-        }
+    // Create cells for each day in the month
+    for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+        cell.textContent = day;
+        cell.className = "day";
+        cell.addEventListener("click", () => showAddEventModal(day));
+        calendar.appendChild(cell);
+    }
+}
 
-        // Create calendar days
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dayDiv = document.createElement('div');
-            dayDiv.innerText = i;
-            calendarDiv.appendChild(dayDiv);
-        }
+// Show modal for adding an event
+function showAddEventModal(day) {
+    const eventDateInput = document.getElementById("eventDate");
+    eventDateInput.value = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
 
-        // Add events to specific days
-        events.forEach(event => {
-            if (event.month === month && event.year === year) {
-                const dayDiv = calendarDiv.children[firstDay + event.date - 1]; // Adjust for header row
-                if (dayDiv) {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = 'event';
-                    eventDiv.innerHTML = `<span class="event-marker"></span>${event.title}`;
-                    dayDiv.classList.add('event-day');
-                    dayDiv.appendChild(eventDiv);
-                }
+// Handle adding an event
+addEventBtn.addEventListener("click", () => {
+    const eventDate = document.getElementById("eventDate").value;
+    const eventTitle = document.getElementById("eventTitle").value;
+    if (eventDate && eventTitle) {
+        const eventDay = new Date(eventDate).getDate();
+        const cells = document.querySelectorAll(".calendar div");
+        cells.forEach(cell => {
+            if (cell.textContent == eventDay && cell.classList.contains("day")) {
+                const event = document.createElement("div");
+                event.className = "event";
+                event.textContent = eventTitle;
+                cell.appendChild(event);
             }
         });
+        alert("Event added!");
+    } else {
+        alert("Please enter both date and title.");
     }
-
-    function updateCalendar(offset) {
-        currentDate.setMonth(currentDate.getMonth() + offset);
-        renderCalendar(currentDate.getMonth(), currentDate.getFullYear());
-    }
-
-    document.getElementById('prevMonth').addEventListener('click', function() {
-        updateCalendar(-1);
-    });
-
-    document.getElementById('nextMonth').addEventListener('click', function() {
-        updateCalendar(1);
-    });
-
-    // Initial render
-    renderCalendar(currentDate.getMonth(), currentDate.getFullYear());
 });
+
+// Navigate to the previous month
+prevMonthBtn.addEventListener("click", () => {
+    if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+    } else {
+        currentMonth--;
+    }
+    renderCalendar(currentMonth, currentYear);
+});
+
+// Navigate to the next month
+nextMonthBtn.addEventListener("click", () => {
+    if (currentMonth === 11) {
+        currentMonth = 0;
+        currentYear++;
+    } else {
+        currentMonth++;
+    }
+    renderCalendar(currentMonth, currentYear);
+});
+
+// Initial calendar render
+renderCalendar(currentMonth, currentYear);
